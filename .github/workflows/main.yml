@@ -1,0 +1,24 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['windows-latest', 'ubuntu-latest']
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+      with:
+        python-version: 3.7
+
+    - run: pip install pyinstaller pyyaml pyparsing
+    - run: mv ${{ github.workspace }}/src/m2ee.py ${{ github.workspace }}/src/run.py
+    - run: pyinstaller src/run.py --onefile --hidden-import=pyyaml --hidden-import=pyparsing
+    - uses: actions/upload-artifact@v2
+      with:
+        name: m2ee
+        path: dist
